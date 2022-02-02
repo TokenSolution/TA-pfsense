@@ -1,0 +1,25 @@
+tracker_id,Description,Interface
+1606358509,OpenVPN TokenVPN wizard wizard,WAN
+1611133642,NAT allow web 1:1 to USD server,WAN
+1611134515,Allow LAN manage firewall,LAN
+1611134599,deny firewall management,LAN
+0100000101,Default allow LAN to any rule,LAN
+0100000102,Default allow LAN IPv6 to any rule,LAN
+1600149339,Block VLAN10 to firewall access,VLAN10
+1600149232,Block VLAN10 to LAN,VLAN10
+1600288694,Block VLAN10 to VLAN20,VLAN10
+1599791574,Allow WAN VLAN 10,VLAN10
+1610674449,Allow DNS,DMZ
+1610674540,Allow NTP,DMZ
+1611162309,Allow LAN to DMZ,DMZ
+1611939634,Allow server to talk to self,DMZ
+1610674697,Deny DMZ to private addresses,DMZ
+1610674755,Allow DMZ WAN,DMZ
+1611939551,implicit deny redundant,DMZ
+1770001239,pfB_DNSBL_Ping auto rule,floating
+1770001466,pfB_DNSBL_Permit auto rule,floating
+1770009076,pfB_Africa_v4 auto rule,floating
+1770008876,pfB_Asia_v4 auto rule,floating
+1770009118,pfB_Europe_v4 auto rule,floating
+1770009018,pfB_DNSBLIP_v4 auto rule,floating
+1770009774,pfB_Africa_v4 auto ruel,floating

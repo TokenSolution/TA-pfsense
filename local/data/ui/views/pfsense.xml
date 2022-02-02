@@ -1,0 +1,408 @@
+<form theme="dark">
+  <label>pfSense Firewall</label>
+  <description>pfSense firewall dashboard</description>
+  <fieldset submitButton="false" autoRun="false">
+    <input type="time" token="time_token" searchWhenChanged="true">
+      <label>Select time range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>TCP vs UDP Connections</title>
+        <search>
+          <query>index=firewall sourcetype=pfsense:filterlog transport=* | timechart span=10m count(src) by transport | fields _time, tcp, udp, icmp</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Allowed vs Blocked</title>
+        <search>
+          <query>index=firewall sourcetype=pfsense:filterlog action=* | timechart count(_raw) by action</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <map>
+        <title>Connection sources</title>
+        <search>
+          <query>index=firewall sourcetype=pfsense:filterlog action=blocked | iplocation src | geostats latfield=lat longfield=lon count(src)</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.map.center">(0,0.18)</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.tileLayer.maxZoom">7</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+      </map>
+    </panel>
+    <panel>
+      <map>
+        <title>Last 24hrs scans</title>
+        <search>
+          <query>index=firewall sourcetype=pfsense:filterlog action=blocked ip_version!=6 
+|  transaction src maxspan=1m maxpause=10s keeporphans=false | where eventcount &gt; 10 | iplocation src | geostats latfield=lat longfield=lon count(src)</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.map.center">(28.3,-1.93)</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.tileLayer.maxZoom">7</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="refresh.display">progressbar</option>
+      </map>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>WordPress Portforward traffic</title>
+      <chart>
+        <search>
+          <query>index=firewall sourcetype=pfsense:filterlog vendor_direction=in action=allowed | where (cidrmatch("10.0.0.0/8",dest_ip) OR cidrmatch("172.16.0.0/12",dest_ip) OR cidrmatch("192.168.0.0/16",dest_ip) OR cidrmatch("169.254.0.0/16",dest_ip) OR cidrmatch("fc00::/7",dest_ip)) | where (NOT (cidrmatch("10.0.0.0/8",src_ip) OR cidrmatch("172.16.0.0/12",src_ip) OR cidrmatch("192.168.0.0/16",src_ip) OR cidrmatch("169.254.0.0/16",src_ip) OR cidrmatch("fc00::/7",src_ip))) | timechart span=24h count by action</query>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <drilldown>
+          <link target="_blank">search?q=index=firewall%20sourcetype=pfsense:filterlog%20vendor_direction=in%20action=allowed%20%7C%20where%20(cidrmatch(%2210.0.0.0/8%22,dest_ip)%20OR%20cidrmatch(%22172.16.0.0/12%22,dest_ip)%20OR%20cidrmatch(%22192.168.0.0/16%22,dest_ip)%20OR%20cidrmatch(%22169.254.0.0/16%22,dest_ip)%20OR%20cidrmatch(%22fc00::/7%22,dest_ip))%20%7C%20where%20(NOT%20(cidrmatch(%2210.0.0.0/8%22,src_ip)%20OR%20cidrmatch(%22172.16.0.0/12%22,src_ip)%20OR%20cidrmatch(%22192.168.0.0/16%22,src_ip)%20OR%20cidrmatch(%22169.254.0.0/16%22,src_ip)%20OR%20cidrmatch(%22fc00::/7%22,src_ip)))%20%7C%20timechart%20span=24h%20count%20by%20action&amp;earliest=-7d@h&amp;latest=now</link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <title>Possible Compromised Machines (Outside src_ip strait to RFC1918 internal IP)</title>
+      <single>
+        <search>
+          <query>index=firewall sourcetype=pfsense:filterlog vendor_direction=in action=allowed NOT dest_ip=192.168.3.4 | where (cidrmatch("10.0.0.0/8",dest_ip) OR cidrmatch("172.16.0.0/12",dest_ip) OR cidrmatch("192.168.0.0/16",dest_ip) OR cidrmatch("169.254.0.0/16",dest_ip) OR cidrmatch("fc00::/7",dest_ip)) | where (NOT (cidrmatch("10.0.0.0/8",src_ip) OR cidrmatch("172.16.0.0/12",src_ip) OR cidrmatch("192.168.0.0/16",src_ip) OR cidrmatch("169.254.0.0/16",src_ip) OR cidrmatch("fc00::/7",src_ip))) | stats dc(src_ip) as count values(src_ip) as src_ip by action, dest_ip, dest_port | table count src_ip dest_ip dest_port action | sort -count</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>NAT port scanned last 7 days</title>
+      <table>
+        <search>
+          <query>index=firewall sourcetype=pfsense:filterlog action=allowed NOT dest_ip=192.168.3.4 NOT dest_ip=192.168.1.1 NOT dest_ip=192.168.1.255
+| where (cidrmatch("10.0.0.0/8",dest_ip) OR cidrmatch("172.16.0.0/12",dest_ip) OR cidrmatch("192.168.0.0/16",dest_ip) OR cidrmatch("169.254.0.0/16",dest_ip) OR cidrmatch("fc00::/7",dest_ip)) 
+| where (cidrmatch("10.0.0.0/8",src_ip) OR cidrmatch("172.16.0.0/12",src_ip) OR cidrmatch("192.168.0.0/16",src_ip) OR cidrmatch("169.254.0.0/16",src_ip) OR cidrmatch("fc00::/7",src_ip)) 
+| eventstats dc(dest_port) AS portCount by src_ip
+| where portCount &gt; 100
+| transaction dest_ip maxspan=1m maxpause=10s keeporphans=false | where eventcount &gt; 10
+| stats count as "Severity" by src_ip, dest_ip
+| appendpipe [stats count | where count=0]</query>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>WIDS Deauth attack</title>
+      <chart>
+        <search>
+          <query>index=unifi disassociated OR associated
+| rex "STA\s(?P&lt;MAC&gt;[^\s]+)"
+| transaction MAC maxspan=1m maxpause=10s | where eventcount &gt; 3
+| stats count by MAC</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 10 Source IP Addresses</title>
+      <input type="time" token="source_ip" searchWhenChanged="true">
+        <label>Time Frame</label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <chart>
+        <search>
+          <query>index=firewall sourcetype="pfsense" | top limit=10 src_ip</query>
+          <earliest>$source_ip.earliest$</earliest>
+          <latest>$source_ip.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Top 10 Source Ports</title>
+      <input type="time" token="source_port" searchWhenChanged="true">
+        <label>Time Frame</label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <chart>
+        <search>
+          <query>index=firewall sourcetype="pfsense"  | top limit=10 src_port</query>
+          <earliest>$source_port.earliest$</earliest>
+          <latest>$source_port.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 10 Destination Ports</title>
+      <input type="time" token="destination_port" searchWhenChanged="true">
+        <label>Time Frame</label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <chart>
+        <search>
+          <query>index=firewall sourcetype="pfsense" | top limit=10 dest_port</query>
+          <earliest>$destination_port.earliest$</earliest>
+          <latest>$destination_port.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Top 10 Protocols</title>
+      <input type="time" token="protocol" searchWhenChanged="true">
+        <label>Time Frame</label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <chart>
+        <search>
+          <query>index=firewall sourcetype="pfsense"  | top limit=10 protocol</query>
+          <earliest>$protocol.earliest$</earliest>
+          <latest>$protocol.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 10 Classifications</title>
+      <input type="time" token="classification" searchWhenChanged="true">
+        <label>Time Frame</label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <table>
+        <search>
+          <query>index=firewall sourcetype="pfsense" | top limit=10 sig_id, classification, | table sig_id, classification, count</query>
+          <earliest>$classification.earliest$</earliest>
+          <latest>$classification.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 10 Threats</title>
+      <input type="time" token="description" searchWhenChanged="true">
+        <label>Time Frame</label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <table>
+        <search>
+          <query>index=firewall sourcetype="pfsense" | top  limit=10 description, classification, src_ip | table  description, classification, src_ip, count</query>
+          <earliest>$description.earliest$</earliest>
+          <latest>$description.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Map of Top 10 Source IP Addresses</title>
+      <input type="time" token="map" searchWhenChanged="true">
+        <label>Time Frame</label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <map>
+        <search>
+          <query>index=firewall sourcetype="pfsense"  | top limit=10 src_ip | iplocation allfields=true src_ip | eval Country = if(isnull(Country) or Country = "", "N/A", Country) | eval City = if(isnull(City) OR City="", "Unknown", City) | eval location = mvzip(City,Country) | geostats count(Country) as Count by location</query>
+          <earliest>$map.earliest$</earliest>
+          <latest>$map.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="mapping.map.scrollZoom">0</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.tileLayer.maxZoom">19</option>
+        <option name="refresh.display">progressbar</option>
+      </map>
+    </panel>
+    <panel>
+      <title>Map of Top 10 Destination IP Addresses</title>
+      <input type="time" token="map" searchWhenChanged="true">
+        <label>Time Frame</label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <map>
+        <search>
+          <query>index=firewall sourcetype="pfsense"  | top limit=10 dest_ip | iplocation allfields=true dest_ip | eval Country = if(isnull(Country) or Country = "", "N/A", Country) | eval City = if(isnull(City) OR City="", "Unknown", City) | eval location = mvzip(City,Country) | geostats count(Country) as Count by location</query>
+          <earliest>-60m@m</earliest>
+          <latest>now</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="mapping.map.scrollZoom">0</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.tileLayer.maxZoom">19</option>
+        <option name="refresh.display">progressbar</option>
+      </map>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 10 list of Source IP Addresses</title>
+      <input type="time" token="list" searchWhenChanged="true">
+        <label>Time Frame</label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <table>
+        <search>
+          <query>index=firewall sourcetype="pfsense" | top limit=10 src_ip | iplocation allfields=true src_ip | fields * | rename count as "Count", lat as "Latitude", lon as "Longitude", percent as "Percent", src_ip as "Source IP" | table "Source IP", "Count", "City", "MetroCode", "Region", "Country", "Timezone", "Latitude", "Longitude"</query>
+          <earliest>$list.earliest$</earliest>
+          <latest>$list.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+      </table>
+    </panel>
+  </row>
+</form>
